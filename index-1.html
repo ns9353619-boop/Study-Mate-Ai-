@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1238">
+<title>StudyMate AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070d2d;--panel:#0d1745;--panel2:#101d52;--text:#f4f7ff;--muted:#a8b3d5;--purple:#6848ff;--blue:#17b9ff;--green:#21d6a3;--pink:#e45cff;--line:#243269}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#07102f;border-right:1px solid var(--line);padding:22px 14px;position:fixed;inset:0 auto 0 0;z-index:10}
+.logo{font-size:22px;font-weight:800;padding:10px 12px 25px;display:flex;gap:9px;align-items:center}
+.logo span{color:#9b7cff}.nav{display:grid;gap:8px}.nav button{background:transparent;color:#aeb9dc;text-align:left;padding:13px 14px;border-radius:12px;font-weight:600}
+.nav button:hover,.nav button.active{background:linear-gradient(90deg,#4d3cf0,#6948ff);color:white}
+.tip{position:absolute;left:14px;right:14px;bottom:20px;padding:18px;border-radius:15px;background:linear-gradient(145deg,#17225b,#24145e);color:#bfc9eb;font-size:13px;line-height:1.5}
+.main{margin-left:245px;width:calc(100% - 245px);padding:22px 28px 45px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:30px}
+.welcome h2{font-size:22px}.welcome p{color:var(--muted);font-size:13px;margin-top:4px}
+.search{width:min(430px,45vw);background:#111e51;border:1px solid #273775;border-radius:28px;padding:12px 18px;color:white;outline:none}
+.page{display:none}.page.active{display:block}
+.badge{display:inline-block;background:#4031a5;color:#c8c0ff;border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700;margin-bottom:14px}
+.hero{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}
+.hero h1{font-size:43px;line-height:1.05;max-width:600px}.hero h1 span{color:#20bfff}.hero p{color:var(--muted);max-width:600px;margin-top:13px;line-height:1.6}
+.robot{font-size:85px;filter:drop-shadow(0 0 25px #5b3dff)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:linear-gradient(145deg,#101d52,#0c1640);border:1px solid #1d2b60;border-radius:18px;padding:20px;box-shadow:0 12px 30px #0003}
+.feature{min-height:130px;display:flex;justify-content:space-between;align-items:center;transition:.2s}
+.feature:hover{transform:translateY(-2px);border-color:#4657a0}
+.icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:23px;background:#203a9b;margin-bottom:15px}
+.card h3{font-size:17px}.card p{color:var(--muted);font-size:13px;margin-top:7px;line-height:1.5}.arrow{font-size:22px;color:#8b78ff}
+.center{grid-column:2;grid-row:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:270px}
+.center .bigicon{font-size:55px;margin-bottom:15px}.primary{background:linear-gradient(90deg,#5237f4,#7b43ff);color:white;border-radius:24px;padding:12px 20px;margin-top:18px;font-weight:700}
+.section-title{margin:10px 0 18px;font-size:28px}
+.form{display:grid;gap:13px;max-width:760px}.form input,.form textarea,.form select{width:100%;background:#0d1745;border:1px solid #2b3b78;color:white;border-radius:12px;padding:13px;outline:none}.form textarea{min-height:150px;resize:vertical}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.secondary{background:#18265d;color:white;border:1px solid #30427f;padding:11px 16px;border-radius:11px}.danger{background:#4a1d3b;color:#ffd8f4;padding:11px 16px;border-radius:11px}
+.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:22px}.note p{white-space:pre-wrap}
+.quiz-options{display:grid;gap:10px;margin-top:18px}.option{padding:13px;background:#14235a;border:1px solid #2c3b75;border-radius:11px;text-align:left;color:white}.option.correct{border-color:#21d6a3;background:#113e3b}.option.wrong{border-color:#ff668d;background:#4b2038}
+.progressbar{height:11px;background:#182654;border-radius:20px;overflow:hidden;margin-top:10px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,#21bfff,#7955ff);width:0}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px}.stat strong{font-size:30px;display:block}.stat small{color:var(--muted)}
+.flash{min-height:220px;display:grid;place-items:center;text-align:center;font-size:24px}.flash small{display:block;color:var(--muted);font-size:13px;margin-top:12px}
+.chat{max-width:800px}.messages{height:390px;overflow:auto;display:grid;gap:12px;margin-bottom:14px}.msg{max-width:80%;padding:13px 15px;border-radius:14px;line-height:1.5}.bot{background:#15255b;justify-self:start}.user{background:#573eff;justify-self:end}.chatrow{display:flex;gap:10px}.chatrow input{flex:1;background:#101d52;border:1px solid #2d3c75;border-radius:12px;padding:13px;color:white;outline:none}
+.plan{display:grid;gap:12px}.day{display:flex;justify-content:space-between;gap:15px;align-items:center}.day b{color:#fff}.day span{color:#aeb9dc}
+.toast{position:fixed;right:20px;bottom:20px;background:#16265d;padding:13px 18px;border:1px solid #40529a;border-radius:12px;display:none;z-index:30}
+@media(max-width:900px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px);padding:18px}.grid,.notes{grid-template-columns:1fr 1fr}.center{grid-column:auto;grid-row:auto}.hero h1{font-size:34px}}
+@media(max-width:650px){.app{display:block}.sidebar{position:sticky;top:0;width:100%;height:auto;padding:10px;display:flex;align-items:center;border-right:0;border-bottom:1px solid var(--line)}.logo{padding:5px 8px;font-size:18px}.nav{display:flex;overflow:auto;gap:4px}.nav button{white-space:nowrap;padding:9px 10px;font-size:12px}.tip{display:none}.main{margin:0;width:100%;padding:14px}.top{align-items:flex-start}.welcome{display:none}.search{width:100%}.hero{flex-direction:column;align-items:flex-start}.robot{display:none}.hero h1{font-size:31px}.grid,.notes,.statgrid{grid-template-columns:1fr}.center{min-height:220px}.card{padding:17px}.messages{height:330px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">🎓 <span>StudyMate</span> AI</div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard">🏠 Dashboard</button>
+    <button data-page="notes">📚 Notes</button>
+    <button data-page="flashcards">⚡ Flashcards</button>
+    <button data-page="quiz">📝 Quiz</button>
+    <button data-page="progress">📊 Progress</button>
+    <button data-page="settings">⚙️ Settings</button>
+  </nav>
+  <div class="tip">✨ Small steps every day<br><b>create big results!</b></div>
+</aside>
+
+<main class="main">
+<header class="top">
+  <div class="welcome"><h2>👋 Welcome back, Learner!</h2><p>Your personalized AI study companion</p></div>
+  <input id="search" class="search" placeholder="🔍 Search topics, notes, or ask anything...">
+</header>
+
+<section id="dashboard" class="page active">
+  <div class="hero">
+    <div>
+      <span class="badge">AI-POWERED LEARNING</span>
+      <h1>Your Study Journey,<br><span>Simplified</span></h1>
+      <p>StudyMate AI turns scattered study material into a simple learning system. Start with notes, quizzes, flashcards, doubts or a personal plan.</p>
+    </div>
+    <div class="robot">🤖</div>
+  </div>
+  <div class="grid">
+    <div class="card feature" data-go="notes"><div><div class="icon">📄</div><h3>Smart Notes</h3><p>Save and organize simple notes</p></div><span class="arrow">→</span></div>
+    <div class="card feature center" data-go="dashboard"><div class="bigicon">🎓</div><h3>Start Learning</h3><p>Choose a feature and make your study smarter!</p><button class="primary" data-go="notes">Get Started →</button></div>
+    <div class="card feature" data-go="flashcards"><div><div class="icon">⚡</div><h3>Flashcards</h3><p>Quick revision</p></div><span class="arrow">→</span></div>
+    <div class="card feature" data-go="quiz"><div><div class="icon">✨</div><h3>Quiz Generator</h3><p>Practice with sample questions</p></div><span class="arrow">→</span></div>
+    <div class="card feature" data-go="chat"><div><div class="icon">🎯</div><h3>AI Doubt Solver</h3><p>Instant study explanations</p></div><span class="arrow">→</span></div>
+    <div class="card feature" data-go="plan"><div><div class="icon">📖</div><h3>Personal Study Plan</h3><p>Plan based on exam & time</p></div><span class="arrow">→</span></div>
+    <div class="card feature" data-go="progress"><div><div class="icon">↗️</div><h3>Progress Tracker</h3><p>Track quiz performance</p></div><span class="arrow">→</span></div>
+  </div>
+</section>
+
+<section id="notes" class="page">
+  <h2 class="section-title">📚 Smart Notes</h2>
+  <div class="card">
+    <div class="form">
+      <input id="noteTitle" placeholder="Note title (e.g. GAAP)">
+      <textarea id="noteText" placeholder="Write your notes here..."></textarea>
+      <div class="actions"><button class="primary" onclick="saveNote()">Save Note</button><button class="secondary" onclick="clearNote()">Clear</button></div>
+    </div>
+  </div>
+  <div id="notesList" class="notes"></div>
+</section>
+
+<section id="flashcards" class="page">
+  <h2 class="section-title">⚡ Flashcards</h2>
+  <div class="card flash" id="flashCard" onclick="flipCard()"><div><div id="flashText">What is GAAP?</div><small>Tap the card to reveal the answer</small></div></div>
+  <div class="actions" style="margin-top:15px"><button class="secondary" onclick="prevFlash()">← Previous</button><button class="primary" onclick="nextFlash()">Next →</button></div>
+</section>
+
+<section id="quiz" class="page">
+  <h2 class="section-title">📝 Quiz</h2>
+  <div class="card">
+    <p id="quizCount" style="color:var(--muted)"></p><h3 id="quizQuestion" style="font-size:22px;margin-top:8px"></h3>
+    <div id="quizOptions" class="quiz-options"></div>
+    <div class="actions" style="margin-top:18px"><button class="primary" onclick="nextQuestion()">Next Question →</button><button class="secondary" onclick="restartQuiz()">Restart</button></div>
+  </div>
+</section>
+
+<section id="progress" class="page">
+  <h2 class="section-title">📊 Progress Tracker</h2>
+  <div class="statgrid">
+    <div class="card stat"><strong id="scoreStat">0</strong><small>Quiz correct answers</small></div>
+    <div class="card stat"><strong id="notesStat">0</strong><small>Saved notes</small></div>
+    <div class="card stat"><strong id="flashStat">0</strong><small>Flashcards viewed</small></div>
+  </div>
+  <div class="card"><h3>Quiz Progress</h3><div class="progressbar"><span id="bar"></span></div><p id="progressText">Start the quiz to track progress.</p></div>
+</section>
+
+<section id="settings" class="page">
+  <h2 class="section-title">⚙️ Settings</h2>
+  <div class="card">
+    <div class="form">
+      <input id="studentName" placeholder="Your name">
+      <select id="themeSelect"><option value="dark">Dark Study Theme</option><option value="light">Light Theme</option></select>
+      <button class="primary" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</section>
+
+<section id="chat" class="page">
+  <h2 class="section-title">🎯 AI Doubt Solver</h2>
+  <div class="card chat">
+    <div id="messages" class="messages"><div class="msg bot">Hi! I am StudyMate's demo doubt solver. Ask me a basic study question such as “What is an asset?”</div></div>
+    <div class="chatrow"><input id="chatInput" placeholder="Type your study doubt..."><button class="primary" onclick="askBot()">Ask</button></div>
+  </div>
+</section>
+
+<section id="plan" class="page">
+  <h2 class="section-title">📖 Personal Study Plan</h2>
+  <div class="card">
+    <div class="form">
+      <input id="examDate" type="date">
+      <select id="studyHours"><option value="1">1 hour/day</option><option value="2" selected>2 hours/day</option><option value="3">3 hours/day</option><option value="4">4 hours/day</option></select>
+      <button class="primary" onclick="makePlan()">Create My Plan</button>
+    </div>
+  </div>
+  <div id="planResult" class="plan" style="margin-top:15px"></div>
+</section>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let notes=JSON.parse(localStorage.getItem('sm_notes')||'[]');
+let stats=JSON.parse(localStorage.getItem('sm_stats')||'{"score":0,"answered":0,"flash":0}');
+let flashIndex=0, flashAnswer=false, quizIndex=0, quizLocked=false;
+const flashcards=[
+ ["What is GAAP?","Generally Accepted Accounting Principles used for reliable financial reporting."],
+ ["What is an asset?","A resource controlled by a business that is expected to provide future economic benefit."],
+ ["What is marketing?","Understanding customer needs, creating value and building profitable customer relationships."],
+ ["What is perception?","The process by which people select, organize and interpret information."],
+ ["What is motivation?","The forces that direct, energize and sustain effort toward a goal."]
+];
+const questions=[
+ {q:"Which of these is a current asset?",o:["Building","Cash","Long-term loan","Capital"],a:1},
+ {q:"GAAP stands for:",o:["Generally Accepted Accounting Principles","Global Accounting Audit Process","General Asset Accounting Policy","Government Approved Accounting Practice"],a:0},
+ {q:"Which OB level focuses on personality and motivation?",o:["Individual","Group","Organization","Industry"],a:0},
+ {q:"Perception means:",o:["Only seeing facts","Selecting, organizing and interpreting information","Making a balance sheet","Selling a product"],a:1},
+ {q:"Which feature is mainly for quick revision?",o:["Flashcards","Settings","Profile","Dashboard"],a:0}
+];
+
+function showPage(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ $(id)?.classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>showPage(b.dataset.go));
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
+function saveNote(){
+ const title=$('noteTitle').value.trim(),text=$('noteText').value.trim();
+ if(!title||!text)return toast('Please enter title and note.');
+ notes.unshift({title,text,date:new Date().toLocaleDateString()});
+ localStorage.setItem('sm_notes',JSON.stringify(notes));$('noteTitle').value='';$('noteText').value='';renderNotes();toast('Note saved!');
+}
+function clearNote(){$('noteTitle').value='';$('noteText').value=''}
+function deleteNote(i){notes.splice(i,1);localStorage.setItem('sm_notes',JSON.stringify(notes));renderNotes()}
+function renderNotes(){
+ $('notesList').innerHTML=notes.length?notes.map((n,i)=>`<div class="card note"><h3>${escapeHtml(n.title)}</h3><p>${escapeHtml(n.text)}</p><small style="color:#7f8bb0">${n.date}</small><br><button class="danger" style="margin-top:12px" onclick="deleteNote(${i})">Delete</button></div>`).join(''):'<div class="card"><p>No notes yet. Create your first note above.</p></div>';
+ $('notesStat').textContent=notes.length;
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function renderFlash(){let c=flashcards[flashIndex];$('flashText').textContent=flashAnswer?c[1]:c[0];$('flashCard').querySelector('small').textContent=flashAnswer?'Tap to see the question':'Tap the card to reveal the answer'}
+function flipCard(){flashAnswer=!flashAnswer;if(flashAnswer){stats.flash++;saveStats();}renderFlash()}
+function nextFlash(){flashIndex=(flashIndex+1)%flashcards.length;flashAnswer=false;renderFlash()}
+function prevFlash(){flashIndex=(flashIndex-1+flashcards.length)%flashcards.length;flashAnswer=false;renderFlash()}
+function renderQuiz(){
+ const q=questions[quizIndex];$('quizCount').textContent=`Question ${quizIndex+1} of ${questions.length}`;
+ $('quizQuestion').textContent=q.q;$('quizOptions').innerHTML=q.o.map((x,i)=>`<button class="option" onclick="answer(${i},this)">${String.fromCharCode(65+i)}. ${x}</button>`).join('');
+ quizLocked=false;
+}
+function answer(i,btn){
+ if(quizLocked)return;quizLocked=true;const q=questions[quizIndex];const opts=document.querySelectorAll('.option');
+ opts[q.a].classList.add('correct');if(i!==q.a)btn.classList.add('wrong');else stats.score++;
+ stats.answered++;saveStats();updateProgress();
+}
+function nextQuestion(){quizIndex=(quizIndex+1)%questions.length;renderQuiz()}
+function restartQuiz(){quizIndex=0;stats.score=0;stats.answered=0;saveStats();renderQuiz();updateProgress()}
+function saveStats(){localStorage.setItem('sm_stats',JSON.stringify(stats))}
+function updateProgress(){
+ $('scoreStat').textContent=stats.score;$('flashStat').textContent=stats.flash;
+ const pct=Math.min(100,Math.round(stats.answered/questions.length*100));$('bar').style.width=pct+'%';
+ $('progressText').textContent=stats.answered?`${stats.score} correct out of ${stats.answered} answered.`:'Start the quiz to track progress.';
+}
+function askBot(){
+ const input=$('chatInput'),q=input.value.trim();if(!q)return;
+ addMsg(q,'user');input.value='';
+ setTimeout(()=>{let x=q.toLowerCase(),ans='Try breaking the topic into definition, key points and an example. If you share your exact topic, StudyMate can explain it step by step.';
+ if(x.includes('asset'))ans='An asset is a resource controlled by a business that is expected to provide future economic benefit. Example: cash, inventory and furniture.';
+ else if(x.includes('gaap'))ans='GAAP means Generally Accepted Accounting Principles. They provide common rules and principles for preparing financial statements.';
+ else if(x.includes('marketing'))ans='Marketing is about understanding customer needs, creating value, communicating that value and building customer relationships.';
+ else if(x.includes('perception'))ans='Perception is the process of selecting, organizing and interpreting information.';
+ else if(x.includes('motivation'))ans='Motivation is the force that directs, energizes and sustains effort toward a goal.';
+ addMsg(ans,'bot')},350);
+}
+function addMsg(t,c){const d=document.createElement('div');d.className='msg '+c;d.textContent=t;$('messages').appendChild(d);$('messages').scrollTop=$('messages').scrollHeight}
+$('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')askBot()});
+function makePlan(){
+ const date=$('examDate').value,h=+$('studyHours').value;
+ const topics=['Accounting','Marketing','Organizational Behaviour','Business English','Revision'];
+ $('planResult').innerHTML=topics.map((t,i)=>`<div class="card day"><b>Day ${i+1}: ${t}</b><span>${h} hour${h>1?'s':''} • Learn + Practice + Revise</span></div>`).join('');
+ toast('Study plan created!');
+}
+function saveSettings(){localStorage.setItem('sm_name',$('studentName').value);toast('Settings saved!')}
+$('search').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=e.target.value.toLowerCase();if(q.includes('note'))showPage('notes');else if(q.includes('quiz'))showPage('quiz');else if(q.includes('flash'))showPage('flashcards');else if(q.includes('plan'))showPage('plan');else if(q.includes('doubt'))showPage('chat');else toast('Try: notes, quiz, flashcards, plan or doubt');}});
+function init(){
+ $('studentName').value=localStorage.getItem('sm_name')||'';
+ renderNotes();renderFlash();renderQuiz();updateProgress();
+}
+init();
+</script>
+</body>
+</html>
