@@ -307,6 +307,12 @@ document.querySelectorAll('.nav button').forEach(button=>{
 });
   
 init();
+  const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.sidebar');
+
+menuToggle.addEventListener('click', function() {
+  sidebar.classList.toggle('open');
+});
 </script>
 </body>
 </html>
