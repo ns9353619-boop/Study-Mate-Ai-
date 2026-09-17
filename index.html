@@ -47,10 +47,51 @@ button{cursor:pointer;border:0}
 .toast{position:fixed;right:20px;bottom:20px;background:#16265d;padding:13px 18px;border:1px solid #40529a;border-radius:12px;display:none;z-index:30}
 @media(max-width:900px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px);padding:18px}.grid,.notes{grid-template-columns:1fr 1fr}.center{grid-column:auto;grid-row:auto}.hero h1{font-size:34px}}
 @media(max-width:650px){.app{display:block}.sidebar{position:sticky;top:0;width:100%;height:auto;padding:10px;display:flex;align-items:center;border-right:0;border-bottom:1px solid var(--line)}.logo{padding:5px 8px;font-size:18px}.nav{display:flex;overflow:auto;gap:4px}.nav button{white-space:nowrap;padding:9px 10px;font-size:12px}.tip{display:none}.main{margin:0;width:100%;padding:14px}.top{align-items:flex-start}.welcome{display:none}.search{width:100%}.hero{flex-direction:column;align-items:flex-start}.robot{display:none}.hero h1{font-size:31px}.grid,.notes,.statgrid{grid-template-columns:1fr}.center{min-height:220px}.card{padding:17px}.messages{height:330px}}
-</style>
+</style>/* Mobile Menu */
+.menu-toggle{
+  display:none;
+  position:fixed;
+  top:12px;
+  left:12px;
+  z-index:1001;
+  width:45px;
+  height:45px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#6848ff,#17b9ff);
+  color:white;
+  font-size:24px;
+  cursor:pointer;
+}
+
+@media(max-width:900px){
+  .menu-toggle{
+    display:block;
+  }
+
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .3s ease;
+    z-index:1000;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    margin-left:0 !important;
+    width:100%;
+  }
+
+  .top{
+    padding-left:65px;
+  }
+}
 </head>
 <body>
 <div class="app">
+  <button class="menu-toggle" id="menuToggle">☰</button>
 <aside class="sidebar">
   <div class="logo">🎓 <span>StudyMate</span> AI</div>
   <nav class="nav">
@@ -250,6 +291,19 @@ function init(){
  $('studentName').value=localStorage.getItem('sm_name')||'';
  renderNotes();renderFlash();renderQuiz();updateProgress();
 }
+  const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.sidebar');
+
+menuToggle.addEventListener('click',()=>{
+  sidebar.classList.toggle('open');
+});
+
+document.querySelectorAll('.nav button').forEach(button=>{
+  button.addEventListener('click',()=>{
+    sidebar.classList.remove('open');
+  });
+});
+  
 init();
 </script>
 </body>
