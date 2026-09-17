@@ -76,7 +76,7 @@ button{cursor:pointer;border:0}
   }
 
   .sidebar.open{
-    transform:translateX(0);
+  transform:translateX(0) !important;
   }
 
   .main{
@@ -92,8 +92,8 @@ button{cursor:pointer;border:0}
 </head>
 <body>
 <div class="app">
-  <button class="menu-toggle"
-    id="menuToggle">=</button>
+  <button class="menu-toggle" id="menuToggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
 <aside class="sidebar">
   <div class="logo">🎓 <span>StudyMate</span> AI</div>
   <nav class="nav">
